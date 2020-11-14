@@ -1,0 +1,57 @@
+version: '3'
+services:
+  mysql:
+    image: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: db_product
+      MYSQL_USER: root
+      MYSQL_PASSWORD: root
+    ports:
+      - "3306:3306"
+    expose:
+      # Opens port 3306 on the container
+      - "3306"
+      # Where our data will be persisted
+    volumes:
+      - my-db:/var/lib/mysql
+  eureka:
+    build: ../microservice-demo/microservice-demo-eureka-server
+    ports:
+      - "8761:8761"
+  customer:
+    build: ../microservice-demo/microservice-demo-customer
+    links:
+     - eureka
+  catalog:
+    build: ../microservice-demo/microservice-demo-catalog
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/db_product?autoReconnect=true&useSSL=false
+    restart: unless-stopped
+    links:
+     - eureka
+    depends_on:
+      - mysql
+  order:
+    build: ../microservice-demo/microservice-demo-order
+    links:
+     - eureka
+  zuul:
+    build: ../microservice-demo/microservice-demo-zuul-server
+    links:
+     - eureka
+    ports:
+      - "8080:8080"
+  turbine:
+    build: ../microservice-demo/microservice-demo-turbine-server
+    links:
+     - eureka
+    ports:
+      - "8989:8989"
+
+# Names our volume
+volumes:
+  my-db:
+

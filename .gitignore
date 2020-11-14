@@ -1,0 +1,9 @@
+.idea
+.mvn*
+/microservice-demo/*mvn
+/microservice-demo/*.iml
+/microservice-demo/*mvn*
+
+/microservice-demo/microservice-demo-*/target/
+/microservice-demo/microservice-demo-*/*.iml
+
